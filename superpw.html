@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Access</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Teko:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple: #7c3aed;
+  --purple-light: #a855f7;
+  --purple-pale: #e9d5ff;
+  --dark: #1a0a2e;
+  --white: #ffffff;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+
+/* =========================================
+   PASSWORD PHASE
+   ========================================= */
+#phase-password {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  display: flex; justify-content: center; align-items: center;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  transition: opacity 0.5s ease;
+  overflow-y: auto; z-index: 5;
+}
+#phase-password.out { opacity: 0; pointer-events: none; }
+
+.pw-card {
+  width: 100%; max-width: 480px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+  overflow: hidden;
+  position: relative;
+}
+.pw-head {
+  background: #2c3e50; color: #fff;
+  text-align: center; padding: 30px 20px;
+  position: relative;
+}
+.pw-head h1 { font-size: 26px; margin-bottom: 8px; }
+.pw-head p  { opacity: 0.75; font-size: 15px; }
+.pw-body { padding: 36px 30px; }
+.fg { margin-bottom: 22px; }
+label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px; }
+input[type=password] {
+  width: 100%; padding: 14px;
+  border: 2px solid #e0e0e0; border-radius: 8px;
+  font-size: 16px; transition: border 0.25s;
+}
+input[type=password]:focus {
+  border-color: #3498db; outline: none;
+  box-shadow: 0 0 0 3px rgba(52,152,219,0.18);
+}
+.btn {
+  width: 100%; padding: 15px;
+  border: none; border-radius: 8px;
+  font-size: 17px; font-weight: 600;
+  cursor: pointer; transition: background 0.25s;
+  margin-top: 8px;
+}
+.btn:active { transform: translateY(2px); }
+.btn-blue { background:#3498db; color:#fff; }
+.btn-blue:hover { background:#2980b9; }
+.btn-red  { background:#e74c3c; color:#fff; }
+.btn-red:hover  { background:#c0392b; }
+.msg {
+  margin-top: 16px; padding: 11px;
+  border-radius: 8px; text-align: center;
+  font-weight: 500; display: none; font-size: 14px;
+}
+.err { background:#ffeaea; color:#e74c3c; border:1px solid #f5c6cb; }
+.ok  { background:#d4edda; color:#27ae60; border:1px solid #c3e6cb; }
+.pw-foot {
+  text-align: center; padding: 14px 20px;
+  color: #aaa; font-size: 13px;
+  border-top: 1px solid #f0f0f0;
+  position: relative;
+}
+/* hidden triggers */
+.ht { position: absolute; cursor: pointer; background: transparent; z-index: 10; }
+#ht1 { top:3px; right:3px; width:5px; height:5px; }
+#ht2 { top:20px; left:50%; transform:translateX(-140%); width:22px; height:22px; border-radius:50%; }
+#ht3 { bottom:0; left:50%; transform:translateX(-50%); width:100px; height:5px; }
+#ht4 { display:inline; color:#2c3e50; font-size:0; cursor:pointer; }
+
+/* Admin modal */
+.am-bg {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82);
+  z-index: 200;
+  justify-content: center; align-items: center;
+}
+.am-bg.open { display: flex; }
+.am-box {
+  background: #fff; width: 90%; max-width: 400px;
+  border-radius: 10px; padding: 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  position: relative;
+  font-family: 'Segoe UI', sans-serif;
+}
+.am-head {
+  background: #e74c3c; color: #fff;
+  padding: 18px; text-align: center;
+  margin: -28px -28px 20px;
+  border-radius: 10px 10px 0 0;
+}
+.am-head h2 { font-size: 20px; }
+.am-close {
+  position: absolute; top:12px; right:14px;
+  background: none; border: none;
+  color: #fff; font-size: 24px; cursor: pointer;
+}
+.am-hint { font-size:13px; color:#666; margin-bottom:18px; line-height:1.5; }
+
+@keyframes shake {
+  0%,100%{transform:translateX(0);}
+  20%,60%{transform:translateX(-6px);}
+  40%,80%{transform:translateX(6px);}
+}
+
+/* =========================================
+   SCANNER PHASE
+   ========================================= */
+#phase-scanner {
+  position: fixed; inset: 0;
+  background: #000;
+  font-family: 'Share Tech Mono', monospace;
+  display: none; z-index: 6;
+}
+#phase-scanner.on { display: block; }
+
+#vid {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+  z-index: 0;
+}
+#cvs {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 1; pointer-events: none;
+  transform: scaleX(-1);
+}
+
+#topbar {
+  position: absolute; top:0; left:0; right:0; height:56px;
+  background: rgba(15,5,30,0.84);
+  border-bottom: 1px solid rgba(168,85,247,0.35);
+  z-index: 10;
+  display: flex; align-items: center; justify-content: center; gap:14px;
+}
+.dot {
+  width:7px; height:7px; border-radius:50%;
+  background: var(--purple-light);
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+.tbar-title { font-size:17px; letter-spacing:.3em; color:var(--purple-pale); text-transform:uppercase; }
+
+/* live badge */
+#live-badge {
+  position: absolute; top: 68px; right: 16px;
+  font-size: 11px; letter-spacing: .2em;
+  color: rgba(168,85,247,0.5);
+  text-transform: uppercase;
+  z-index: 10;
+  transition: color 0.2s;
+}
+#live-badge.hot { color: #c084fc; }
+
+#botbar {
+  position: absolute; bottom:0; left:0; right:0;
+  background: rgba(15,5,30,0.9);
+  border-top: 1px solid rgba(168,85,247,0.35);
+  z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap:14px;
+  padding: 18px 28px 22px;
+}
+
+#status {
+  font-size: 11px; letter-spacing: .25em;
+  color: rgba(168,85,247,0.6);
+  text-transform: uppercase;
+  text-align: center;
+}
+#status.on { color: #c084fc; }
+
+/* gesture nodes */
+#nodes {
+  display: flex; align-items: center;
+}
+.gn {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 2px solid rgba(124,58,237,0.3);
+  background: rgba(15,5,30,0.8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: bold;
+  color: rgba(168,85,247,0.35);
+  transition: all 0.35s;
+  font-family: 'Share Tech Mono', monospace;
+}
+.gn.cur {
+  border-color: var(--purple-light);
+  color: var(--purple-pale);
+  box-shadow: 0 0 0 5px rgba(168,85,247,0.18);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.gn.done {
+  border-color: #22c55e;
+  background: rgba(34,197,94,0.12);
+  color: #4ade80;
+  box-shadow: 0 0 14px rgba(34,197,94,0.4);
+  animation: none;
+}
+@keyframes pulse {
+  0%,100%{box-shadow:0 0 0 5px rgba(168,85,247,0.16);}
+  50%{box-shadow:0 0 0 10px rgba(168,85,247,0.32);}
+}
+.gl {
+  width: 40px; height: 2px;
+  background: rgba(124,58,237,0.22);
+  transition: background 0.4s;
+}
+.gl.done { background: rgba(34,197,94,0.6); }
+
+/* hold bar */
+#hold-row {
+  width: 100%; max-width: 340px;
+  display: flex; align-items: center; gap: 11px;
+}
+#hold-track {
+  flex: 1; height: 15px;
+  border: 1px solid rgba(124,58,237,0.4);
+  border-radius: 5px; overflow: hidden;
+}
+#hold-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--purple), var(--purple-light));
+  border-radius: 5px; transition: width 0.08s linear;
+}
+#hold-pct {
+  font-size: 12px; color: var(--purple-light);
+  min-width: 38px; text-align: right;
+}
+
+/* =========================================
+   SUCCESS
+   ========================================= */
+#success {
+  position: fixed; inset: 0; z-index: 99;
+  background: rgba(15,5,30,0.97);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.65s ease;
+  font-family: 'Share Tech Mono', monospace;
+}
+#success.show { opacity: 1; pointer-events: all; }
+.chk-ring {
+  width:74px; height:74px; border-radius:50%;
+  border:2px solid var(--purple-light);
+  background:rgba(124,58,237,0.1);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:32px;
+}
+.chk-ring svg { width:32px; height:32px; }
+.big-text {
+  font-family: 'Teko', sans-serif; font-weight:600;
+  font-size: clamp(48px,10vw,110px);
+  letter-spacing:.06em; text-transform:uppercase;
+  color: var(--white); text-align:center; line-height:1;
+  margin-bottom:20px;
+  animation: fadeUp 0.9s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+.divider { width:54px;height:1px;background:rgba(168,85,247,0.45);margin-bottom:18px; }
+.sub-text {
+  font-size:clamp(12px,2vw,20px); letter-spacing:.25em;
+  color:rgba(168,85,247,0.6); text-transform:uppercase;
+}
+.sub-text em { font-style:normal; color:var(--purple-light); }
+</style>
+</head>
+<body>
+
+<!-- ========== PASSWORD ========== -->
+<div id="phase-password">
+  <div class="pw-card">
+    <div class="ht" id="ht1"></div>
+    <div class="ht" id="ht2"></div>
+    <div class="ht" id="ht3"></div>
+    <div class="pw-head">
+      <h1>🔒 Secure Access</h1>
+      <p>Enter the password to access the protected content</p>
+    </div>
+    <div class="pw-body">
+      <div class="fg">
+        <label for="pw-in">Enter Password:</label>
+        <input type="password" id="pw-in" placeholder="Type password here" autocomplete="off">
+      </div>
+      <button class="btn btn-blue" id="pw-btn">Access Content</button>
+      <div class="msg" id="pw-msg"></div>
+    </div>
+    <div class="pw-foot">
+      Secure Access System&nbsp;<span id="ht4" class="ht">·</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCANNER ========== -->
+<div id="phase-scanner">
+  <video id="vid" autoplay playsinline muted></video>
+  <canvas id="cvs"></canvas>
+
+  <div id="topbar">
+    <div class="dot"></div>
+    <span class="tbar-title">Biometric Verification</span>
+    <div class="dot" style="animation-delay:.7s"></div>
+  </div>
+
+  <div id="live-badge">scanning...</div>
+
+  <div id="botbar">
+    <div id="status">Place hand in frame to begin</div>
+
+    <div id="nodes">
+      <div class="gn cur" id="g0">1</div>
+      <div class="gl" id="l0"></div>
+      <div class="gn" id="g1">2</div>
+      <div class="gl" id="l1"></div>
+      <div class="gn" id="g2">3</div>
+      <div class="gl" id="l2"></div>
+      <div class="gn" id="g3">4</div>
+    </div>
+
+    <div id="hold-row">
+      <div id="hold-track"><div id="hold-fill"></div></div>
+      <div id="hold-pct">0%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADMIN MODAL ========== -->
+<div class="am-bg" id="am">
+  <div class="am-box">
+    <div class="am-head">
+      <h2>🔐 Admin Panel Access</h2>
+      <button class="am-close" id="am-close">&times;</button>
+    </div>
+    <p class="am-hint"><strong>Admin Access Required</strong><br>Enter the admin password to proceed.</p>
+    <div class="fg">
+      <label for="am-in">Admin Password:</label>
+      <input type="password" id="am-in" placeholder="Enter admin password" autocomplete="off">
+    </div>
+    <button class="btn btn-red" id="am-btn">Access Admin Panel</button>
+    <div class="msg" id="am-msg"></div>
+  </div>
+</div>
+
+<!-- ========== SUCCESS ========== -->
+<div id="success">
+  <div class="chk-ring">
+    <svg viewBox="0 0 32 32" fill="none">
+      <path d="M6 16L13 23L26 9" stroke="#a855f7" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="big-text">Authentication<br>Successful</div>
+  <div class="divider"></div>
+  <div class="sub-text">made by <em>Developer Zarvions_Z</em></div>
+</div>
+
+<!-- MediaPipe -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+<script>
+/* ============================================
+   CONFIG
+   ============================================ */
+const PW_USER  = 'gmcigm1523';
+const PW_ADMIN = 'senaiaroi';
+const DEST     = 'panel.html';
+
+/*  Secret gesture sequence (DO NOT REVEAL TO USER)
+    1. open_spread  ✋  all 4 fingers up, spread wide apart
+    2. open_flat    🖐️  all 4 fingers up, pressed together
+    3. fist         ✊  all 4 fingers curled down
+    4. call_me      🤙  only pinky up (+ thumb)               */
+const SEQ     = ['open_spread','open_flat','fist','call_me'];
+const HOLD_MS = 1400;
+const LOCK_MS = 900;
+
+/* ============================================
+   UTILS
+   ============================================ */
+const $ = id => document.getElementById(id);
+
+function showMsg(el, text, cls) {
+  el.textContent = text;
+  el.className   = 'msg ' + cls;
+  el.style.display = 'block';
+}
+function hideMsg(el) { el.style.display = 'none'; }
+
+function shake(el) {
+  el.style.animation = 'none';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    el.style.animation = 'shake 0.45s';
+  }));
+}
+
+/* ============================================
+   PASSWORD LOGIC
+   ============================================ */
+$('pw-btn').addEventListener('click', checkPW);
+$('pw-in').addEventListener('keydown', e => { if (e.key === 'Enter') checkPW(); });
+
+function checkPW() {
+  const v = $('pw-in').value.trim();
+  hideMsg($('pw-msg'));
+  if (v === PW_USER) {
+    $('pw-in').value = '';
+    showMsg($('pw-msg'), '✓ Password accepted — initialising biometric scan...', 'ok');
+    setTimeout(launchScanner, 1500);
+  } else {
+    $('pw-in').value = '';
+    $('pw-in').focus();
+    showMsg($('pw-msg'), '✗ Incorrect password. Please try again.', 'err');
+    shake($('pw-in'));
+  }
+}
+
+/* ============================================
+   ADMIN MODAL
+   ============================================ */
+function openAdmin() { $('am').classList.add('open'); $('am-in').focus(); }
+function closeAdmin() {
+  $('am').classList.remove('open');
+  $('am-in').value = '';
+  hideMsg($('am-msg'));
+}
+
+['ht1','ht2','ht3','ht4'].forEach(id => {
+  const el = $(id); if (el) el.addEventListener('click', openAdmin);
+});
+$('am-close').addEventListener('click', closeAdmin);
+$('am').addEventListener('click', e => { if (e.target === $('am')) closeAdmin(); });
+
+$('am-btn').addEventListener('click', checkAdmin);
+$('am-in').addEventListener('keydown', e => { if (e.key === 'Enter') checkAdmin(); });
+
+function checkAdmin() {
+  const v = $('am-in').value.trim();
+  hideMsg($('am-msg'));
+  if (v === PW_ADMIN) {
+    $('am-in').value = '';
+    showMsg($('am-msg'), '✓ Admin access granted! Redirecting...', 'ok');
+    setTimeout(() => { window.location.href = DEST; }, 1400);
+  } else {
+    $('am-in').value = '';
+    $('am-in').focus();
+    showMsg($('am-msg'), '✗ Incorrect admin password. Access denied.', 'err');
+    shake($('am-in'));
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.altKey && e.key.toLowerCase() === 'a') {
+    e.preventDefault(); openAdmin();
+  }
+});
+
+let rc = 0, rt;
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  if (++rc >= 3) { rc = 0; clearTimeout(rt); openAdmin(); return; }
+  clearTimeout(rt);
+  rt = setTimeout(() => rc = 0, 1100);
+});
+
+/* ============================================
+   SCANNER LAUNCH
+   ============================================ */
+function launchScanner() {
+  $('phase-password').classList.add('out');
+  setTimeout(() => {
+    $('phase-password').style.display = 'none';
+    $('phase-scanner').classList.add('on');
+    initCanvas();
+    initMediaPipe();
+  }, 550);
+}
+
+/* ============================================
+   CANVAS
+   ============================================ */
+const cvs = $('cvs');
+const ctx = cvs.getContext('2d');
+
+function initCanvas() {
+  cvs.width  = window.innerWidth;
+  cvs.height = window.innerHeight;
+}
+window.addEventListener('resize', initCanvas);
+
+/* ============================================
+   GESTURE DETECTION
+
+   Uses DISTANCE-FROM-WRIST method — works at
+   any hand angle, not just fingers-pointing-up.
+
+   Spread detection uses tip-spread / base-spread
+   ratio so it's self-normalising.
+   ============================================ */
+function d2(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function classify(lm) {
+  const W = lm[0]; // wrist (landmark 0)
+
+  /* Extended = tip is farther from wrist than PIP joint */
+  const iE = d2(lm[8],  W) > d2(lm[6],  W);  // index
+  const mE = d2(lm[12], W) > d2(lm[10], W);  // middle
+  const rE = d2(lm[16], W) > d2(lm[14], W);  // ring
+  const pE = d2(lm[20], W) > d2(lm[18], W);  // pinky
+
+  const allUp   = iE && mE && rE && pE;
+  const allDown = !iE && !mE && !rE && !pE;
+
+  if (allUp) {
+    /* Spread = (index tip ↔ pinky tip) / (index MCP ↔ pinky MCP) */
+    const tipSpread  = d2(lm[8],  lm[20]);
+    const baseSpread = d2(lm[5],  lm[17]) || 0.001;
+    const ratio      = tipSpread / baseSpread;
+    /* ratio > ~1.1 → fingers spread (✋) */
+    /* ratio < ~0.9 → fingers together (🖐️) */
+    return ratio > 1.05 ? 'open_spread' : 'open_flat';
+  }
+
+  if (allDown) return 'fist';
+
+  /* Call-me: pinky extended, index/middle/ring down */
+  if (pE && !iE && !mE && !rE) return 'call_me';
+
+  return 'none';
+}
+
+/* ============================================
+   SCANNER STATE
+   ============================================ */
+let step      = 0;
+let holdStart = null;
+let lockUntil = 0;
+let done      = false;
+let mpCam     = null;
+
+function setBar(pct) {
+  $('hold-fill').style.width = pct + '%';
+  $('hold-pct').textContent  = pct + '%';
+}
+
+function confirmStep(i) {
+  const n = $('g' + i);
+  n.classList.remove('cur');
+  n.classList.add('done');
+  n.textContent = '✓';
+  if (i < 3) {
+    $('l' + i).classList.add('done');
+    $('g' + (i + 1)).classList.add('cur');
+  }
+}
+
+function triggerSuccess() {
+  done = true;
+  setBar(100);
+  if (mpCam) try { mpCam.stop(); } catch(_) {}
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  $('success').classList.add('show');
+  setTimeout(() => { window.location.href = DEST; }, 3500);
+}
+
+/* ============================================
+   MEDIAPIPE CALLBACK
+   ============================================ */
+function onResults(results) {
+  if (done) return;
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+  const hands   = results.multiHandLandmarks;
+  const present = hands && hands.length > 0;
+
+  if (!present) {
+    $('status').classList.remove('on');
+    $('status').textContent = 'Place hand in frame to begin';
+    $('live-badge').classList.remove('hot');
+    $('live-badge').textContent = 'scanning...';
+    holdStart = null;
+    setBar(0);
+    return;
+  }
+
+  /* Draw hand skeleton */
+  for (const lm of hands) {
+    ctx.save();
+    ctx.shadowColor = '#e879f9'; ctx.shadowBlur = 30;
+    drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#d946ef', lineWidth: 5 });
+    ctx.shadowBlur = 18;
+    drawLandmarks(ctx, lm, { color: '#fff', fillColor: '#e879f9', lineWidth: 2, radius: 9 });
+    ctx.restore();
+    drawConnectors(ctx, lm, HAND_CONNECTIONS, { color: '#ffffff', lineWidth: 2 });
+    drawLandmarks(ctx, lm, { color: '#fff', fillColor: '#f5d0fe', lineWidth: 1, radius: 6 });
+  }
+
+  $('status').classList.add('on');
+
+  /* Lock period after a gesture is confirmed */
+  if (performance.now() < lockUntil) {
+    $('status').textContent = `Gesture ${step}/4 confirmed ✓  —  try next pose...`;
+    setBar(0);
+    return;
+  }
+
+  const lm      = hands[0];
+  const gesture = classify(lm);
+  const target  = SEQ[step];
+
+  /* Abstract live indicator (no gesture names shown) */
+  const detected = gesture !== 'none';
+  $('live-badge').classList.toggle('hot', detected);
+  $('live-badge').textContent = detected
+    ? `gesture ${step + 1}/4 ●`
+    : 'scanning...';
+
+  if (gesture === target) {
+    if (!holdStart) holdStart = performance.now();
+    const elapsed  = performance.now() - holdStart;
+    const progress = Math.min(elapsed / HOLD_MS, 1);
+    const pct      = Math.round(progress * 100);
+    setBar(pct);
+    $('status').textContent = `Hold gesture ${step + 1} steady...`;
+
+    if (progress >= 1) {
+      confirmStep(step);
+      step++;
+      holdStart = null;
+      lockUntil = performance.now() + LOCK_MS;
+      setBar(0);
+      if (step >= 4) {
+        $('status').textContent = 'All gestures verified — authenticating...';
+        setTimeout(triggerSuccess, 700);
+      }
+    }
+
+  } else {
+    holdStart = null;
+    setBar(0);
+    $('status').textContent = step === 0
+      ? 'Try different hand poses...'
+      : `Gesture ${step + 1}/4 — try a different pose...`;
+  }
+}
+
+/* ============================================
+   MEDIAPIPE INIT
+   ============================================ */
+function initMediaPipe() {
+  const vid = $('vid');
+
+  const handsModel = new Hands({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`,
+  });
+  handsModel.setOptions({
+    maxNumHands: 1,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.6,
+    minTrackingConfidence: 0.5,
+  });
+  handsModel.onResults(onResults);
+
+  mpCam = new Camera(vid, {
+    onFrame: async () => { await handsModel.send({ image: vid }); },
+    width: 1280, height: 720,
+  });
+
+  mpCam.start().catch(err => {
+    $('status').textContent = 'Camera access denied — please allow camera permission';
+    console.error('Camera error:', err);
+  });
+}
+</script>
+</body>
+</html>
