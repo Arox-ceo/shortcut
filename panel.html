@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Zarvions_Z | Special Shortcut Panel</title>
+  <!-- Google Fonts & Font Awesome 6 -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, #1A0A2E 0%, #0E051C 100%);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    .dashboard {
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    /* header */
+    .hero {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #E9B824 20%, #C73C1E 60%, #A855F7 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .hero p {
+      color: #cfc3e6;
+      margin-top: 0.5rem;
+      border-bottom: 1px dashed rgba(233, 184, 36, 0.4);
+      display: inline-block;
+      padding-bottom: 6px;
+    }
+
+    /* toolbar */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      background: rgba(25, 10, 45, 0.6);
+      backdrop-filter: blur(12px);
+      padding: 0.8rem 1.5rem;
+      border-radius: 60px;
+      border: 1px solid rgba(233, 184, 36, 0.3);
+    }
+
+    .shortcut-counter {
+      background: #2E1A48;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      color: #FADB67;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .shortcut-counter i {
+      margin-right: 6px;
+      color: #E9B824;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #2a1a3b;
+      border-radius: 48px;
+      padding: 0.3rem 1rem;
+      border: 1px solid #A855F7;
+    }
+
+    .search-box i {
+      color: #F5B042;
+      margin-right: 8px;
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      padding: 8px 0;
+      color: #F3E8FF;
+      font-weight: 500;
+      outline: none;
+      width: 180px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid #E9B824;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #FFECB3;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .action-btn:hover {
+      background: #A855F7;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .danger-btn {
+      border-color: #C73C1E;
+      background: rgba(199, 60, 30, 0.2);
+    }
+    .danger-btn:hover {
+      background: #C73C1E;
+      color: white;
+    }
+
+    /* add section */
+    .add-section {
+      background: rgba(46, 20, 76, 0.65);
+      backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid rgba(233, 184, 36, 0.5);
+    }
+
+    .add-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+      color: #FADB67;
+      font-weight: 700;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .input-group {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #E9B9A0;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: #211235;
+      border: 1px solid #7D55C7;
+      border-radius: 24px;
+      padding: 12px 18px;
+      color: #FFF3E0;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #F5B042;
+      box-shadow: 0 0 0 2px rgba(233, 184, 36, 0.3);
+    }
+
+    .add-btn {
+      background: linear-gradient(115deg, #A855F7, #C73C1E);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(115deg, #B96EFF, #E05A3A);
+    }
+
+    /* shortcuts grid - special cards are BIGGER & BETTER */
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.8rem;
+      margin-top: 1rem;
+    }
+
+    /* Base card style */
+    .shortcut-card {
+      background: rgba(20, 10, 35, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 28px;
+      padding: 1rem 1rem 1rem 1.5rem;
+      transition: transform 0.25s ease, box-shadow 0.25s;
+      border: 1px solid rgba(233, 184, 36, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* SPECIAL CARD: bigger, glowing, premium */
+    .shortcut-card.special {
+      background: linear-gradient(145deg, rgba(128, 70, 210, 0.35), rgba(199, 60, 30, 0.25));
+      border: 2px solid;
+      border-image: linear-gradient(135deg, #E9B824, #A855F7, #C73C1E) 1;
+      box-shadow: 0 12px 30px rgba(168, 85, 247, 0.4), 0 0 15px rgba(233, 184, 36, 0.3);
+      transform: scale(1.02);
+      padding: 1.2rem 1.2rem 1.2rem 1.5rem;
+    }
+
+    .shortcut-card.special:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 35px rgba(199, 60, 30, 0.5);
+    }
+
+    .shortcut-card.special .card-info a {
+      font-size: 1.35rem;
+      font-weight: 800;
+      background: linear-gradient(120deg, #FFE6B0, #FFB347);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+
+    .shortcut-card.special .url-preview {
+      font-size: 0.8rem;
+      color: #E9C9FF;
+    }
+
+    .badge-special {
+      background: linear-gradient(95deg, #E9B824, #C73C1E);
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 30px;
+      font-size: 0.6rem;
+      font-weight: bold;
+      margin-left: 8px;
+      color: #1f0a30;
+      vertical-align: middle;
+    }
+
+    .card-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .card-info a {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #FFECB3;
+      text-decoration: none;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-info a:hover {
+      color: #FADB67;
+      text-decoration: underline;
+    }
+
+    .url-preview {
+      font-size: 0.7rem;
+      color: #B59FE9;
+      margin-top: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .card-actions button {
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+    }
+
+    .edit-btn {
+      color: #FADB67;
+      background: rgba(233, 184, 36, 0.2);
+    }
+    .edit-btn:hover {
+      background: #E9B824;
+      color: #1f0a30;
+      transform: scale(1.05);
+    }
+    .delete-btn {
+      color: #FF7A5C;
+      background: rgba(199, 60, 30, 0.2);
+    }
+    .delete-btn:hover {
+      background: #C73C1E;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: #CFB5F0;
+      grid-column: 1 / -1;
+    }
+
+    /* social footer */
+    .social-footer {
+      margin-top: 3rem;
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(233, 184, 36, 0.4);
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 48px;
+    }
+
+    .social-footer h4 {
+      color: #FADB67;
+      margin-bottom: 1rem;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .social-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(128, 70, 210, 0.3);
+      padding: 8px 18px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 500;
+      color: #FFECBC;
+      border: 1px solid rgba(233, 184, 36, 0.5);
+      transition: 0.2s;
+    }
+
+    .social-icon:hover {
+      background: #A855F7;
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 1rem; }
+      .hero h1 { font-size: 1.8rem; }
+      .toolbar { flex-direction: column; align-items: stretch; border-radius: 28px; }
+      .toolbar-actions { justify-content: center; }
+      .shortcuts-grid { grid-template-columns: 1fr; }
+      .shortcut-card.special { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+<div class="dashboard">
+  <div class="hero">
+    <h1><i class="fas fa-crown"></i> Zarvions_Z Shortcut</h1>
+    <p>✦ Shortcut • Link • Media social ✦</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="shortcut-counter">
+      <i class="fas fa-layer-group"></i> <span id="shortcutCount">0</span> shortcuts
+    </div>
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Filter shortcuts...">
+    </div>
+    <div class="toolbar-actions">
+      <button class="action-btn" id="exportTemplateBtn" title="Save current shortcuts as JSON template"><i class="fas fa-download"></i> Export</button>
+      <button class="action-btn" id="importTemplateBtn" title="Load template from JSON file"><i class="fas fa-upload"></i> Import</button>
+      <button class="action-btn danger-btn" id="removeAllBtn" title="Delete ALL shortcuts"><i class="fas fa-trash-alt"></i> Remove All</button>
+      <button class="action-btn" id="resetDefaultBtn" title="Reset to 5 Special Shortcuts"><i class="fas fa-star"></i> Reset Specials</button>
+    </div>
+  </div>
+
+  <!-- add shortcut -->
+  <div class="add-section">
+    <div class="add-title">
+      <i class="fas fa-plus-circle"></i> <span>Add custom shortcut (regular)</span>
+    </div>
+    <div class="form-row">
+      <div class="input-group">
+        <label><i class="fas fa-tag"></i> Title</label>
+        <input type="text" id="shortcutName" placeholder="e.g., Zarvions Hub">
+      </div>
+      <div class="input-group">
+        <label><i class="fas fa-globe"></i> URL</label>
+        <input type="text" id="shortcutUrl" placeholder="https:// or any link">
+      </div>
+      <button class="add-btn" id="addShortcutBtn"><i class="fas fa-plus"></i> Add Shortcut</button>
+    </div>
+  </div>
+
+  <!-- shortcuts grid : special cards will appear larger -->
+  <div id="shortcutsContainer" class="shortcuts-grid"></div>
+
+  <!-- social media footer -->
+  <div class="social-footer">
+    <h4><i class="fas fa-share-alt"></i> CONNECT & FOLLOW</h4>
+    <div class="social-icons">
+      <a href="https://www.tiktok.com/" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i> TikTok</a>
+      <a href="https://www.youtube.com/@aalvaroemranadirga2612" target="_blank" class="social-icon"><i class="fab fa-youtube"></i> YouTube</a>
+      <a href="https://discord.gg/K8XQSrQvB7" target="_blank" class="social-icon"><i class="fab fa-discord"></i> Discord</a>
+      <a href="https://wa.me/87872789660" target="_blank" class="social-icon"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+      <a href="https://lynk.id/zarvions_z" target="_blank" class="social-icon"><i class="fas fa-link"></i> Lynk</a>
+      <a href="https://github.com/" target="_blank" class="social-icon"><i class="fab fa-github"></i> GitHub</a>
+    </div>
+    <p style="font-size: 0.7rem; margin-top: 1rem; color:#b493e0;">✨ 5 special shortcuts glow • add/edit/delete • template import/export ✨</p>
+  </div>
+</div>
+
+<script>
+  // ---------- 5 SPECIAL SHORTCUTS (bigger, premium) ----------
+  const getSpecialShortcuts = () => [
+    { id: "spec-1", name: "⚡ Panel Iciki Net", url: "https://pgms.arsyanet.my.id/", isSpecial: true },
+    { id: "spec-2", name: "🎨 Codetap", url: "https://www.codetap.org/", isSpecial: true },
+    { id: "spec-3", name: "🤖 Discord", url: "https://discord.gg/K8XQSrQvB7", isSpecial: true },
+    { id: "spec-4", name: "🏆 github", url: "https://github.com/", isSpecial: true },
+    { id: "spec-5", name: "💜 youtube", url: "https://www.youtube.com", isSpecial: true }
+  ];
+
+  let shortcuts = [];      // array of shortcut objects { id, name, url, isSpecial? }
+  let filterText = "";
+
+  // DOM elements
+  const container = document.getElementById("shortcutsContainer");
+  const searchInput = document.getElementById("searchInput");
+  const resetDefaultBtn = document.getElementById("resetDefaultBtn");
+  const removeAllBtn = document.getElementById("removeAllBtn");
+  const addBtn = document.getElementById("addShortcutBtn");
+  const nameInput = document.getElementById("shortcutName");
+  const urlInput = document.getElementById("shortcutUrl");
+  const countSpan = document.getElementById("shortcutCount");
+  const exportBtn = document.getElementById("exportTemplateBtn");
+  const importBtn = document.getElementById("importTemplateBtn");
+
+  // Helper: normalize URL
+  function normalizeUrl(rawUrl) {
+    let trimmed = rawUrl.trim();
+    if (!trimmed) return "";
+    if (!/^https?:\/\//i.test(trimmed)) return "https://" + trimmed;
+    return trimmed;
+  }
+
+  // Add new shortcut (regular, not special)
+  function addNewShortcut() {
+    let rawName = nameInput.value.trim();
+    let rawUrl = urlInput.value.trim();
+    if (!rawName) { alert("❌ Enter a title."); return; }
+    if (!rawUrl) { alert("❌ Enter a URL."); return; }
+    let finalUrl = normalizeUrl(rawUrl);
+    try {
+      new URL(finalUrl);
+    } catch(e) { alert("⚠️ Invalid URL. Use full address like example.com"); return; }
+    const newId = "reg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+    shortcuts.push({ id: newId, name: rawName.slice(0, 45), url: finalUrl, isSpecial: false });
+    saveToLocalStorage();
+    renderShortcuts();
+    nameInput.value = "";
+    urlInput.value = "";
+    showToast("✅ Regular shortcut added");
+  }
+
+  function deleteShortcutById(id) {
+    if (confirm("🗑️ Remove this shortcut?")) {
+      shortcuts = shortcuts.filter(s => s.id !== id);
+      saveToLocalStorage();
+      renderShortcuts();
+    }
+  }
+
+  function editShortcut(shortcutItem) {
+    let newName = prompt("✏️ Edit name:", shortcutItem.name);
+    if (newName === null) return;
+    let newUrl = prompt("🔗 Edit URL:", shortcutItem.url);
+    if (newUrl === null) return;
+    newName = newName.trim();
+    if (!newName) { alert("Name cannot be empty."); return; }
+    let finalUrl = normalizeUrl(newUrl.trim());
+    if (!finalUrl) { alert("Invalid URL."); return; }
+    try { new URL(finalUrl); } catch(e) { alert("Invalid URL format."); return; }
+    shortcutItem.name = newName.slice(0, 45);
+    shortcutItem.url = finalUrl;
+    // keep isSpecial flag unchanged
+    saveToLocalStorage();
+    renderShortcuts();
+    showToast("✏️ Shortcut updated");
+  }
+
+  // Remove ALL shortcuts
+  function removeAllShortcuts() {
+    if (confirm("⚠️ REMOVE ALL shortcuts? This cannot be undone (except reset).")) {
+      shortcuts = [];
+      saveToLocalStorage();
+      renderShortcuts();
+      showToast("🗑️ All shortcuts removed.");
+    }
+  }
+
+  // Reset to exactly the 5 special shortcuts (bigger & better)
+  function resetToSpecials() {
+    if (confirm("Reset to 5 premium special shortcuts? Your current list will be replaced.")) {
+      shortcuts = getSpecialShortcuts();
+      saveToLocalStorage();
+      filterText = "";
+      searchInput.value = "";
+      renderShortcuts();
+      showToast("✨ 5 special shortcuts restored! (bigger & better)");
+    }
+  }
+
+  // ---------- TEMPLATE SAVING (EXPORT / IMPORT) includes isSpecial flag ----------
+  function exportTemplate() {
+    if (shortcuts.length === 0) {
+      alert("No shortcuts to export. Add some first.");
+      return;
+    }
+    // Export full data including isSpecial flag and name/url
+    const templateData = shortcuts.map(s => ({ name: s.name, url: s.url, isSpecial: s.isSpecial || false }));
+    const dataStr = JSON.stringify(templateData, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `zarvions_special_template_${new Date().toISOString().slice(0,19)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("📁 Template exported (special flags preserved)");
+  }
+
+  function importTemplateFromFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) throw new Error("Invalid format");
+        const newShortcuts = [];
+        for (let item of imported) {
+          if (item.name && item.url && typeof item.name === "string" && typeof item.url === "string") {
+            let validUrl = normalizeUrl(item.url);
+            try { new URL(validUrl); } catch(err) { continue; }
+            newShortcuts.push({
+              id: "imp_" + Date.now() + "_" + Math.random().toString(36).substring(2, 6) + "_" + newShortcuts.length,
+              name: item.name.slice(0, 45),
+              url: validUrl,
+              isSpecial: item.isSpecial === true   // preserve special status for styling
+            });
+          }
+        }
+        if (newShortcuts.length === 0) throw new Error("No valid shortcuts found");
+        if (confirm(`Import ${newShortcuts.length} shortcuts (special styling preserved)? This will replace current list.`)) {
+          shortcuts = newShortcuts;
+          saveToLocalStorage();
+          filterText = "";
+          searchInput.value = "";
+          renderShortcuts();
+          showToast(`✅ Imported ${newShortcuts.length} shortcuts`);
+        }
+      } catch (err) {
+        alert("❌ Invalid template file. Use JSON exported from this panel.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function triggerImport() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+    input.onchange = (e) => {
+      if (input.files && input.files[0]) importTemplateFromFile(input.files[0]);
+      input.remove();
+    };
+    input.click();
+  }
+
+  // localStorage
+  function saveToLocalStorage() {
+    localStorage.setItem("zarvions_special_shortcuts", JSON.stringify(shortcuts));
+  }
+
+  function loadFromLocalStorage() {
+    const stored = localStorage.getItem("zarvions_special_shortcuts");
+    if (stored) {
+      try {
+        let parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length) {
+          shortcuts = parsed;
+          return;
+        }
+      } catch(e) {}
+    }
+    // First time: set 5 special shortcuts
+    shortcuts = getSpecialShortcuts();
+    saveToLocalStorage();
+  }
+
+  // Render - apply 'special' class to cards with isSpecial === true
+  function renderShortcuts() {
+    const filtered = shortcuts.filter(s =>
+      s.name.toLowerCase().includes(filterText.toLowerCase()) ||
+      s.url.toLowerCase().includes(filterText.toLowerCase())
+    );
+    countSpan.innerText = filtered.length;
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="no-results"><i class="fas fa-crown"></i> No shortcuts match "${filterText}"<br><span style="font-size:0.9rem;">➕ Add new or reset specials</span></div>`;
+      return;
+    }
+    container.innerHTML = "";
+    for (let short of filtered) {
+      let domain = "";
+      try { domain = new URL(short.url).hostname; } catch(e) { domain = short.url.slice(0, 35); }
+      const card = document.createElement("div");
+      card.className = "shortcut-card";
+      if (short.isSpecial) {
+        card.classList.add("special");
+      }
+      const specialBadge = short.isSpecial ? '<span class="badge-special"><i class="fas fa-gem"></i> SPECIAL</span>' : '';
+      card.innerHTML = `
+        <div class="card-info">
+          <a href="${short.url}" target="_blank" rel="noopener noreferrer" title="Open ${short.name}">
+            <i class="fas ${short.isSpecial ? 'fa-crown' : 'fa-external-link-alt'}" style="font-size:0.8rem; margin-right:8px; color:#E9B824;"></i> 
+            ${escapeHtml(short.name)} ${specialBadge}
+          </a>
+          <div class="url-preview"><i class="fas fa-link"></i> ${escapeHtml(domain.length > 40 ? domain.slice(0,37)+'...' : domain)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="edit-btn" data-id="${short.id}" title="Edit shortcut"><i class="fas fa-pen"></i></button>
+          <button class="delete-btn" data-id="${short.id}" title="Delete shortcut"><i class="fas fa-trash-alt"></i></button>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+    // attach events
+    document.querySelectorAll(".edit-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        const target = shortcuts.find(s => s.id === id);
+        if (target) editShortcut(target);
+      });
+    });
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        deleteShortcutById(id);
+      });
+    });
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+  }
+
+  function updateFilter() {
+    filterText = searchInput.value.trim();
+    renderShortcuts();
+  }
+
+  function showToast(msg) {
+    const toast = document.createElement("div");
+    toast.innerText = msg;
+    toast.style.position = "fixed";
+    toast.style.bottom = "20px";
+    toast.style.left = "50%";
+    toast.style.transform = "translateX(-50%)";
+    toast.style.backgroundColor = "#2E1A48";
+    toast.style.color = "#FADB67";
+    toast.style.borderLeft = "5px solid #C73C1E";
+    toast.style.padding = "10px 20px";
+    toast.style.borderRadius = "40px";
+    toast.style.fontWeight = "500";
+    toast.style.zIndex = "999";
+    toast.style.backdropFilter = "blur(10px)";
+    toast.style.fontSize = "0.85rem";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2200);
+  }
+
+  // Event listeners
+  function init() {
+    loadFromLocalStorage();
+    renderShortcuts();
+    searchInput.addEventListener("input", updateFilter);
+    resetDefaultBtn.addEventListener("click", resetToSpecials);
+    removeAllBtn.addEventListener("click", removeAllShortcuts);
+    addBtn.addEventListener("click", addNewShortcut);
+    nameInput.addEventListener("keypress", (e) => { if (e.key === "Enter") addNewShortcut(); });
+    urlInput.addEventListener("keypress", (e) => { if (e.key === "Enter") addNewShortcut(); });
+    exportBtn.addEventListener("click", exportTemplate);
+    importBtn.addEventListener("click", triggerImport);
+  }
+  init();
+</script>
+</body>
+</html>
